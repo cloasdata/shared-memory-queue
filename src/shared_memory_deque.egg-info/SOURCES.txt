@@ -1,0 +1,13 @@
+LICENSE.md
+README.md
+pyproject.toml
+setup.cfg
+src/shared_memory_deque/__init__.py
+src/shared_memory_deque/deque.py
+src/shared_memory_deque.egg-info/PKG-INFO
+src/shared_memory_deque.egg-info/SOURCES.txt
+src/shared_memory_deque.egg-info/dependency_links.txt
+src/shared_memory_deque.egg-info/not-zip-safe
+src/shared_memory_deque.egg-info/requires.txt
+src/shared_memory_deque.egg-info/top_level.txt
+test/test_deque.py

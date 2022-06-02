@@ -1,0 +1,75 @@
+Metadata-Version: 2.1
+Name: shared-memory-deque
+Version: 0.1
+Summary: a deque like implementation using multiprocessing.shared_memory
+Home-page: https://github.com/cloasdata/shared-memory-deque
+Author: Simon Bauer
+Author-email: code@seimenadventure.de
+License: MIT
+Keywords: multiprocessing,queue,shared-memory
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+Provides-Extra: test
+License-File: LICENSE.md
+
+# shared-memory-deque
+## readme
+StaticQueue class memes the collections.deque interface.
+The goal for this class was to improve performance of mp.Queue class.
+
+Outcome:
+shared-memory-deque is slower than the classic mp.Queue.
+The supplied implementation is limited to static size per item and bytes only.
+Pickling is not included and needs to be done in front.
+So I dropped the idea and did not finalize. 
+One clear advantage is the pickle-ability of shared-memory-deque. So it can be easily 
+invoked anywhere without the need to inherit from the process spwan/fork.
+
+## install
+```pip install shared-memory-deque```
+
+## usage
+```python
+from shared_memory_deque import StaticDeque
+deque = StaticDeque(10, 2)
+deque.append(b"ed")
+deque.pop()
+```
+
+## bottle neck
+I found that the memoryview assignment of large chunk size is the most time-consuming.
+~~A possible workaround could to have a second data object which is build counter-wise.
+so that one could do a pop_left as a pop from a reversed(data)~~
+Another solution could be to just ignore the leading bytes until the memory chunk is consumed 
+with data. When put then a new block is created and assigned. One could use a first pointer. 
+
+
+```commandline
+Function: pop_left at line 72
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    72                                               def pop_left(self):
+    73     10000     441134.0     44.1      6.3          if not self.is_empty:
+    74     10000     228660.0     22.9      3.3              res = self.data.buf[:self.length].tobytes()
+    75     10000    5496619.0    549.7     78.8              self.data.buf[:self._memsize - self.length] = self.data.buf[self.length:self._memsize]
+    76     10000     754754.0     75.5     10.8              self.last = self.last - self.length
+    77     10000      53957.0      5.4      0.8              return res
+    78                                                   else:
+    79                                                       raise Empty
+
+```
+
+## __future__
+Not sure if I will add more free time to this little project. 
+So don't use this module for production or anything else half ways serious. 
+
+Copyright © 2022 Simon Bauer
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
